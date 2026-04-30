@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const translateBtn = document.getElementById('translateBtn');
     const clearBtn = document.getElementById('clearBtn');
     const status = document.getElementById('status');
+    const textStyle = document.getElementById('textStyle');
 
     const languages = [
         { code: 'auto', name: 'Автоопределение' },
@@ -20,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
         { code: 'ja', name: '日本語' }
     ];
 
-    // Заполняем селекты
     languages.forEach(lang => {
         const optFrom = document.createElement('option');
         optFrom.value = lang.code;
@@ -34,21 +34,71 @@ document.addEventListener('DOMContentLoaded', () => {
             langTo.appendChild(optTo);
         }
     });
-    langTo.value = 'ru'; // По умолчанию переводим на русский
+    langTo.value = 'ru';
 
-    translateBtn.addEventListener('click', async () => {
-        const text = inputText.value.trim();
-        if (!text) {
-            status.textContent = '⚠️ Введите текст для перевода';
-            return;
+    // === 🎭 ФУНКЦИЯ СТИЛИЗАЦИИ ===
+    function applyTextStyle(text, style) {
+        if (!text || style === 'original') return text;
+        let result = text.trim();
+
+        const maps = {
+            formal: {
+                'hi': 'greetings', 'hello': 'greetings', 'hey': 'greetings',
+                'thanks': 'thank you', 'ok': 'acknowledged', 'okay': 'acknowledged',
+                'wanna': 'wish to', 'gonna': 'intend to', 'kids': 'children',
+                'guys': 'colleagues', 'bad': 'unsatisfactory', 'good': 'satisfactory',
+                'help': 'assistance', 'fix': 'resolve', 'buy': 'purchase'
+            },
+            casual: {
+                'hello': 'hey', 'greetings': 'hi', 'thank you': 'thanks',
+                'acknowledged': 'got it', 'wish to': 'wanna', 'intend to': 'gonna',
+                'children': 'kids', 'colleagues': 'guys', 'unsatisfactory': 'not great',
+                'satisfactory': 'pretty good', 'assistance': 'help', 'resolve': 'fix',
+                'purchase': 'buy'
+            },
+            simple: {
+                'utilize': 'use', 'approximately': 'about', 'commence': 'start',
+                'terminate': 'end', 'obtain': 'get', 'difficult': 'hard',
+                'excellent': 'great', 'sufficient': 'enough', 'attempt': 'try'
+            },
+            poetic: {
+                'very good': 'magnificent', 'bad': 'shadowed', 'happy': 'bright-hearted',
+                'sad': 'heavy-souled', 'beautiful': 'radiant', 'fast': 'swift as wind',
+                'slow': 'gentle as stream', 'big': 'vast', 'small': 'delicate',
+                'think': 'ponder', 'look': 'gaze', 'walk': 'wander'
+            }
+        };
+
+        if (maps[style]) {
+            Object.entries(maps[style]).forEach(([from, to]) => {
+                const regex = new RegExp(`\\b${from}\\b`, 'gi');
+                result = result.replace(regex, to);
+            });
         }
 
+        if (style === 'formal' && !result.match(/^(dear|greetings|respectfully|please)/i)) {
+            result = 'Please find the following: ' + result.charAt(0).toUpperCase() + result.slice(1);
+        } else if (style === 'casual') {
+            result = result.replace(/([.!?])\s*$/, '') + ' 😊';
+        } else if (style === 'simple') {
+            result = result.replace(/([.!?])\s+/g, '$1\n');
+        } else if (style === 'poetic') {
+            result = result.replace(/([.!?])\s+/g, '$1 ✨\n');
+        }
+
+        return result.charAt(0).toUpperCase() + result.slice(1);
+    }
+
+    // === 🔄 КНОПКА ПЕРЕВОДА ===
+    translateBtn.addEventListener('click', async () => {
+        const text = inputText.value.trim();
+        if (!text) { status.textContent = '⚠️ Введите текст'; return; }
+
         translateBtn.disabled = true;
-        status.textContent = '⏳ Перевод...';
+        status.textContent = '⏳ Перевод и стилизация...';
 
         const from = langFrom.value;
         const to = langTo.value;
-        // Используем бесплатный MyMemory API
         const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`;
 
         try {
@@ -57,8 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
 
             if (data.responseStatus === 200) {
-                outputText.value = data.responseData.translatedText;
-                status.textContent = '✅ Перевод выполнен';
+                const translated = data.responseData.translatedText;
+                outputText.value = applyTextStyle(translated, textStyle.value);
+                status.textContent = '✅ Готово!';
             } else {
                 throw new Error(data.responseDetails || 'Ошибка API');
             }
@@ -76,106 +127,4 @@ document.addEventListener('DOMContentLoaded', () => {
         outputText.value = '';
         status.textContent = '';
     });
-  // === 🎭 ФИЛЬТР СТИЛЕЙ ТЕКСТА ===
-function applyTextStyle(text, style) {
-    if (!text || style === 'original') return text;
-
-    let result = text.trim();
-
-    // 🔹 Официальный
-    if (style === 'formal') {
-        const map = {
-            'hi': 'greetings', 'hello': 'greetings', 'hey': 'greetings',
-            'thanks': 'thank you', 'thanks a lot': 'thank you very much',
-            'ok': 'acknowledged', 'okay': 'acknowledged',
-            'wanna': 'wish to', 'gonna': 'intend to',
-            'kids': 'children', 'guys': 'colleagues',
-            'bad': 'unsatisfactory', 'good': 'satisfactory',
-            'help': 'assistance', 'fix': 'resolve', 'buy': 'purchase'
-        };
-        Object.entries(map).forEach(([from, to]) => {
-            const regex = new RegExp(`\\b${from}\\b`, 'gi');
-            result = result.replace(regex, to);
-        });
-        if (!result.match(/^(dear|greetings|respectfully|please)/i)) {
-            result = 'Please find the following: ' + result.charAt(0).toUpperCase() + result.slice(1);
-        }
-    }
-    // 🔹 Разговорный
-    else if (style === 'casual') {
-        const map = {
-            'hello': 'hey', 'greetings': 'hi', 'thank you': 'thanks',
-            'acknowledged': 'got it', 'wish to': 'wanna', 'intend to': 'gonna',
-            'children': 'kids', 'colleagues': 'guys',
-            'unsatisfactory': 'not great', 'satisfactory': 'pretty good',
-            'assistance': 'help', 'resolve': 'fix', 'purchase': 'buy'
-        };
-        Object.entries(map).forEach(([from, to]) => {
-            const regex = new RegExp(`\\b${from}\\b`, 'gi');
-            result = result.replace(regex, to);
-        });
-        result = result.replace(/([.!?])\s*$/, '') + ' 😊';
-    }
-    // 🔹 Простой
-    else if (style === 'simple') {
-        const map = {
-            'utilize': 'use', 'approximately': 'about', 'commence': 'start',
-            'terminate': 'end', 'obtain': 'get', 'difficult': 'hard',
-            'excellent': 'great', 'sufficient': 'enough', 'attempt': 'try'
-        };
-        Object.entries(map).forEach(([from, to]) => {
-            const regex = new RegExp(`\\b${from}\\b`, 'gi');
-            result = result.replace(regex, to);
-        });
-        result = result.replace(/([.!?])\s+/g, '$1\n');
-    }
-    // 🔹 Поэтичный
-    else if (style === 'poetic') {
-        const map = {
-            'very good': 'magnificent', 'bad': 'shadowed', 'happy': 'bright-hearted',
-            'sad': 'heavy-souled', 'beautiful': 'radiant', 'fast': 'swift as wind',
-            'slow': 'gentle as stream', 'big': 'vast', 'small': 'delicate',
-            'think': 'ponder', 'look': 'gaze', 'walk': 'wander'
-        };
-        Object.entries(map).forEach(([from, to]) => {
-            const regex = new RegExp(`\\b${from}\\b`, 'gi');
-            result = result.replace(regex, to);
-        });
-        result = result.replace(/([.!?])\s+/g, '$1 ✨\n');
-    }
-
-    // Сохраняем регистр первой буквы
-    return result.charAt(0).toUpperCase() + result.slice(1);
-}
-
-// Интегрируем фильтр в кнопку перевода
-const originalTranslateBtnHandler = translateBtn.onclick;
-translateBtn.onclick = async () => {
-    const style = document.getElementById('textStyle').value;
-    const rawText = inputText.value.trim();
-    if (!rawText) return;
-
-    translateBtn.disabled = true;
-    status.textContent = '⏳ Перевод и стилизация...';
-
-    try {
-        const from = langFrom.value === 'auto' ? 'auto|en' : langFrom.value;
-        const to = langTo.value;
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(rawText)}&langpair=${from}|${to}`;
-        const res = await fetch(url);
-        const data = await res.json();
-
-        if (data.responseStatus === 200) {
-            const translated = data.responseData.translatedText;
-            outputText.value = applyTextStyle(translated, style);
-            status.textContent = '✅ Готово!';
-        } else {
-            status.textContent = '❌ Ошибка API';
-        }
-    } catch (err) {
-        status.textContent = `❌ Ошибка: ${err.message}`;
-    } finally {
-        translateBtn.disabled = false;
-    }
-};
 });

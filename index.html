@@ -9,29 +9,34 @@
 <body>
     <div class="container">
         <h1>🌐 Онлайн Переводчик</h1>
+        
+        <!-- Выбор языков -->
         <div class="controls">
             <select id="langFrom"></select>
             <span>→</span>
             <select id="langTo"></select>
         </div>
+
+        <!-- Выбор стиля текста -->
+        <div class="style-controls">
+            <label for="textStyle">🎭 Стиль текста:</label>
+            <select id="textStyle">
+                <option value="original">🔹 Прямой перевод</option>
+                <option value="formal">📜 Официальный/Деловой</option>
+                <option value="casual">💬 Разговорный/Дружеский</option>
+                <option value="simple">🧒 Простой/Для понимания</option>
+                <option value="poetic">✨ Поэтичный/Художественный</option>
+            </select>
+        </div>
+
         <div class="text-areas">
             <textarea id="inputText" placeholder="Введите текст для перевода..."></textarea>
             <textarea id="outputText" placeholder="Перевод появится здесь..." readonly></textarea>
         </div>
+
         <div class="buttons">
             <button id="translateBtn">Перевести</button>
             <button id="clearBtn">Очистить</button>
-            <div class="style-controls">
-    <label for="textStyle">🎭 Стиль текста:</label>
-    <select id="textStyle">
-        <option value="original">🔹 Прямой перевод</option>
-        <option value="formal">📜 Официальный/Деловой</option>
-        <option value="casual">💬 Разговорный/Дружеский</option>
-        <option value="simple">🧒 Простой/Для понимания</option>
-        <option value="poetic">✨ Поэтичный/Художественный</option>
-    </select>
-</div>
-<           
         </div>
         <p id="status"></p>
     </div>
