@@ -76,59 +76,106 @@ document.addEventListener('DOMContentLoaded', () => {
         outputText.value = '';
         status.textContent = '';
     });
-    // === 🎨 ПАНЕЛЬ СТИЛИЗАЦИИ ===
-const outputText = document.getElementById('outputText');
-const stylePanel = document.querySelector('.style-panel');
+  // === 🎭 ФИЛЬТР СТИЛЕЙ ТЕКСТА ===
+function applyTextStyle(text, style) {
+    if (!text || style === 'original') return text;
 
-// Обработчик кнопок стилей
-stylePanel?.addEventListener('click', (e) => {
-    if (e.target.tagName === 'BUTTON') {
-        const style = e.target.dataset.style;
-        // Переключение активного состояния
-        document.querySelectorAll('.style-panel button').forEach(btn => btn.classList.remove('active'));
-        e.target.classList.toggle('active');
-        
-        // Применение стилей
-        const classMap = {
-            'bold': 'output-bold',
-            'italic': 'output-italic', 
-            'underline': 'output-underline',
-            'colorful': 'output-colorful',
-            'neon': 'output-neon',
-            'typewriter': 'output-typewriter'
+    let result = text.trim();
+
+    // 🔹 Официальный
+    if (style === 'formal') {
+        const map = {
+            'hi': 'greetings', 'hello': 'greetings', 'hey': 'greetings',
+            'thanks': 'thank you', 'thanks a lot': 'thank you very much',
+            'ok': 'acknowledged', 'okay': 'acknowledged',
+            'wanna': 'wish to', 'gonna': 'intend to',
+            'kids': 'children', 'guys': 'colleagues',
+            'bad': 'unsatisfactory', 'good': 'satisfactory',
+            'help': 'assistance', 'fix': 'resolve', 'buy': 'purchase'
         };
-        
-        Object.values(classMap).forEach(cls => outputText.classList.remove(cls));
-        if (classMap[style] && e.target.classList.contains('active')) {
-            outputText.classList.add(classMap[style]);
+        Object.entries(map).forEach(([from, to]) => {
+            const regex = new RegExp(`\\b${from}\\b`, 'gi');
+            result = result.replace(regex, to);
+        });
+        if (!result.match(/^(dear|greetings|respectfully|please)/i)) {
+            result = 'Please find the following: ' + result.charAt(0).toUpperCase() + result.slice(1);
         }
     }
-});
-
-// Шрифт
-document.getElementById('fontFamily')?.addEventListener('change', (e) => {
-    outputText.style.fontFamily = e.target.value;
-});
-
-// Цвет текста
-document.getElementById('textColor')?.addEventListener('input', (e) => {
-    outputText.style.color = e.target.value;
-    // Отключаем эффекты, конфликтующие с цветом
-    if (['colorful', 'neon'].some(s => document.querySelector(`[data-style="${s}"]`)?.classList.contains('active'))) {
-        document.querySelectorAll('.style-panel button').forEach(btn => btn.classList.remove('active'));
-        outputText.classList.remove('output-colorful', 'output-neon');
+    // 🔹 Разговорный
+    else if (style === 'casual') {
+        const map = {
+            'hello': 'hey', 'greetings': 'hi', 'thank you': 'thanks',
+            'acknowledged': 'got it', 'wish to': 'wanna', 'intend to': 'gonna',
+            'children': 'kids', 'colleagues': 'guys',
+            'unsatisfactory': 'not great', 'satisfactory': 'pretty good',
+            'assistance': 'help', 'resolve': 'fix', 'purchase': 'buy'
+        };
+        Object.entries(map).forEach(([from, to]) => {
+            const regex = new RegExp(`\\b${from}\\b`, 'gi');
+            result = result.replace(regex, to);
+        });
+        result = result.replace(/([.!?])\s*$/, '') + ' 😊';
     }
-});
+    // 🔹 Простой
+    else if (style === 'simple') {
+        const map = {
+            'utilize': 'use', 'approximately': 'about', 'commence': 'start',
+            'terminate': 'end', 'obtain': 'get', 'difficult': 'hard',
+            'excellent': 'great', 'sufficient': 'enough', 'attempt': 'try'
+        };
+        Object.entries(map).forEach(([from, to]) => {
+            const regex = new RegExp(`\\b${from}\\b`, 'gi');
+            result = result.replace(regex, to);
+        });
+        result = result.replace(/([.!?])\s+/g, '$1\n');
+    }
+    // 🔹 Поэтичный
+    else if (style === 'poetic') {
+        const map = {
+            'very good': 'magnificent', 'bad': 'shadowed', 'happy': 'bright-hearted',
+            'sad': 'heavy-souled', 'beautiful': 'radiant', 'fast': 'swift as wind',
+            'slow': 'gentle as stream', 'big': 'vast', 'small': 'delicate',
+            'think': 'ponder', 'look': 'gaze', 'walk': 'wander'
+        };
+        Object.entries(map).forEach(([from, to]) => {
+            const regex = new RegExp(`\\b${from}\\b`, 'gi');
+            result = result.replace(regex, to);
+        });
+        result = result.replace(/([.!?])\s+/g, '$1 ✨\n');
+    }
 
-// Кнопка "Копировать со стилем" (опционально)
-const copyBtn = document.createElement('button');
-copyBtn.textContent = '📋 Копировать';
-copyBtn.style.cssText = 'margin-top:0.5rem;padding:0.6rem 1.2rem;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer';
-copyBtn.addEventListener('click', () => {
-    outputText.select();
-    document.execCommand('copy');
-    status.textContent = '✅ Скопировано!';
-    setTimeout(() => status.textContent = '', 2000);
-});
-document.querySelector('.buttons')?.after(copyBtn);
+    // Сохраняем регистр первой буквы
+    return result.charAt(0).toUpperCase() + result.slice(1);
+}
+
+// Интегрируем фильтр в кнопку перевода
+const originalTranslateBtnHandler = translateBtn.onclick;
+translateBtn.onclick = async () => {
+    const style = document.getElementById('textStyle').value;
+    const rawText = inputText.value.trim();
+    if (!rawText) return;
+
+    translateBtn.disabled = true;
+    status.textContent = '⏳ Перевод и стилизация...';
+
+    try {
+        const from = langFrom.value === 'auto' ? 'auto|en' : langFrom.value;
+        const to = langTo.value;
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(rawText)}&langpair=${from}|${to}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.responseStatus === 200) {
+            const translated = data.responseData.translatedText;
+            outputText.value = applyTextStyle(translated, style);
+            status.textContent = '✅ Готово!';
+        } else {
+            status.textContent = '❌ Ошибка API';
+        }
+    } catch (err) {
+        status.textContent = `❌ Ошибка: ${err.message}`;
+    } finally {
+        translateBtn.disabled = false;
+    }
+};
 });
