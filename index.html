@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн Переводчик</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Онлайн Переводчик</h1>
+        <div class="controls">
+            <select id="langFrom"></select>
+            <span>→</span>
+            <select id="langTo"></select>
+        </div>
+        <div class="text-areas">
+            <textarea id="inputText" placeholder="Введите текст для перевода..."></textarea>
+            <textarea id="outputText" placeholder="Перевод появится здесь..." readonly></textarea>
+        </div>
+        <div class="buttons">
+            <button id="translateBtn">Перевести</button>
+            <button id="clearBtn">Очистить</button>
+        </div>
+        <p id="status"></p>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
