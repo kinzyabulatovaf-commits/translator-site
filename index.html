@@ -21,6 +21,24 @@
         <div class="buttons">
             <button id="translateBtn">Перевести</button>
             <button id="clearBtn">Очистить</button>
+            <!-- Панель стилизации -->
+<div class="style-panel">
+    <span class="style-label">✨ Стиль:</span>
+    <button data-style="bold" title="Жирный">𝐁</button>
+    <button data-style="italic" title="Курсив">𝐼</button>
+    <button data-style="underline" title="Подчёркнутый">U̲</button>
+    <button data-style="colorful" title="Радуга">🌈</button>
+    <button data-style="neon" title="Неон">💡</button>
+    <button data-style="typewriter" title="Печатная машинка">⌨️</button>
+    <select id="fontFamily" title="Шрифт">
+        <option value="">Шрифт</option>
+        <option value="'Comic Sans MS', cursive">🎨 Comic</option>
+        <option value="'Courier New', monospace">⌨️ Mono</option>
+        <option value="'Georgia', serif">📜 Georgia</option>
+        <option value="'Impact', sans-serif">🔥 Impact</option>
+    </select>
+    <input type="color" id="textColor" title="Цвет текста" value="#333333">
+</div>
         </div>
         <p id="status"></p>
     </div>

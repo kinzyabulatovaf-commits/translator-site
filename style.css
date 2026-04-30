@@ -101,3 +101,98 @@ button {
     color: #666;
     font-size: 0.9rem;
 }
+/* ѕанель стилей */
+.style-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    margin: 1rem 0;
+    padding: 0.8rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.style-label {
+    font-weight: 500;
+    color: #555;
+}
+
+.style-panel button {
+    padding: 0.4rem 0.8rem;
+    font-size: 1.1rem;
+    background: #fff;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .style-panel button:hover, .style-panel button.active {
+        background: #2575fc;
+        color: #fff;
+        border-color: #2575fc;
+    }
+
+#fontFamily, #textColor {
+    padding: 0.4rem;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Ёффекты текста */
+.output-bold {
+    font-weight: bold !important;
+}
+
+.output-italic {
+    font-style: italic !important;
+}
+
+.output-underline {
+    text-decoration: underline !important;
+}
+
+.output-colorful {
+    background: linear-gradient(90deg, red, orange, yellow, green, blue, purple);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: rainbow 3s linear infinite;
+}
+
+@keyframes rainbow {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+
+    100% {
+        filter: hue-rotate(360deg);
+    }
+}
+
+.output-neon {
+    color: #fff;
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #0ff, 0 0 40px #0ff, 0 0 80px #0ff;
+}
+
+.output-typewriter {
+    font-family: 'Courier New', monospace;
+    border-right: 3px solid #333;
+    white-space: pre-wrap;
+    animation: blink 0.7s infinite;
+}
+
+@keyframes blink {
+    50% {
+        border-color: transparent;
+    }
+}
+
+/* ќбновлЄнный output textarea */
+#outputText {
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
