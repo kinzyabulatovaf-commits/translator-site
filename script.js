@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (map) {
             Object.entries(map).forEach(([from, to]) => {
-                // Экранируем спецсимволы для безопасного Regex
                 const escaped = from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 const regex = new RegExp(`(^|[\\s,.;:!?(){}\\[\\]])${escaped}($|[\\s,.;:!?(){}\\[\\]])`, 'gi');
                 result = result.replace(regex, (match, p1, p2) => `${p1}${to}${p2}`);
@@ -56,52 +55,49 @@ document.addEventListener('DOMContentLoaded', () => {
         return result.charAt(0).toUpperCase() + result.slice(1);
     }
 
-    // По умолчанию: EN → RU
     langFrom.value = 'en';
     langTo.value = 'ru';
 
     translateBtn.addEventListener('click', async () => {
         const text = inputText.value.trim();
-        if (!text) {
-            status.textContent = 'Введите текст для перевода';
-            return;
-        }
+        if (!text) { status.textContent = 'Введите текст'; return; }
 
         translateBtn.disabled = true;
-        translateBtn.textContent = 'Перевод...';
+        translateBtn.textContent = 'Загрузка...';
         status.textContent = '';
         outputText.value = '';
 
         const from = langFrom.value;
         const to = langTo.value;
-        console.log(`🌐 Запрос: ${from} → ${to} | Стиль: ${textStyle.value}`);
-
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`;
+        
+        // Добавлен параметр &de для увеличения лимита (5000 слов/день)
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}&mt=1&de=github_user@demo.com`;
 
         try {
-            const res = await fetch(url);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            console.log('🌐 Отправка запроса:', url);
+            const res = await fetch(url, { cache: 'no-store' });
+            if (!res.ok) throw new Error(`Сеть: ${res.status} ${res.statusText}`);
+            
             const data = await res.json();
             console.log('📦 Ответ API:', data);
 
-            // Устойчивая проверка (учитывает строку "200" и число 200)
-            if (data.responseData && data.responseData.translatedText) {
+            // Устойчивая проверка (число 200 или строка "200")
+            if (data.responseStatus == 200 && data.responseData?.translatedText) {
                 const translated = data.responseData.translatedText;
-                console.log('✅ Сырой перевод:', translated);
+                console.log('✅ Перевод получен:', translated);
                 
-                // Небольшая задержка для плавности UX
-                await new Promise(r => setTimeout(r, 300));
-                
+                // Применяем стиль
                 outputText.value = applyTextStyle(translated, textStyle.value, to);
                 status.textContent = 'Готово';
-                console.log('✨ Итог:', outputText.value);
             } else {
-                throw new Error(data.responseDetails || 'API вернул пустой ответ');
+                // Если API вернул ошибку или лимит превышен
+                const err = data.responseDetails || 'API вернул пустой ответ или превышен лимит';
+                throw new Error(err);
             }
         } catch (err) {
             console.error('❌ Ошибка:', err);
-            status.textContent = `Ошибка: ${err.message}`;
-            outputText.value = 'Не удалось перевести текст. Попробуйте позже.';
+            status.textContent = 'Ошибка API. Попробуйте через 1 минуту или проверьте интернет.';
+            outputText.value = '';
         } finally {
             translateBtn.disabled = false;
             translateBtn.textContent = 'Перевести';
