@@ -3,43 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Онлайн Переводчик</title>
+    <title>Переводчик</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>🌐 Онлайн Переводчик</h1>
-        
-        <!-- Выбор языков -->
-        <div class="controls">
-            <select id="langFrom"></select>
-            <span>→</span>
-            <select id="langTo"></select>
-        </div>
+    <header class="header">
+        <!-- Замените div ниже на <img src="logo.png" alt="Логотип" class="logo"> когда будет готов -->
+        <div class="logo-placeholder">🍐</div>
+        <h1 class="slogan">Бесконечность — не предел</h1>
+    </header>
 
-        <!-- Выбор стиля текста -->
-        <div class="style-controls">
-            <label for="textStyle">🎭 Стиль текста:</label>
-            <select id="textStyle">
-                <option value="original">🔹 Прямой перевод</option>
-                <option value="formal">📜 Официальный/Деловой</option>
-                <option value="casual">💬 Разговорный/Дружеский</option>
-                <option value="simple">🧒 Простой/Для понимания</option>
-                <option value="poetic">✨ Поэтичный/Художественный</option>
+    <main class="container">
+        <div class="lang-selectors">
+            <select id="langFrom">
+                <option value="en">English</option>
+                <option value="ru">Русский</option>
+            </select>
+            <span class="arrow">→</span>
+            <select id="langTo">
+                <option value="ru">Русский</option>
+                <option value="en">English</option>
             </select>
         </div>
 
-        <div class="text-areas">
-            <textarea id="inputText" placeholder="Введите текст для перевода..."></textarea>
-            <textarea id="outputText" placeholder="Перевод появится здесь..." readonly></textarea>
+        <div class="text-box">
+            <textarea id="inputText" placeholder="Введите текст..."></textarea>
+            <div class="divider"></div>
+            <textarea id="outputText" placeholder="Перевод..." readonly></textarea>
         </div>
 
-        <div class="buttons">
-            <button id="translateBtn">Перевести</button>
-            <button id="clearBtn">Очистить</button>
+        <div class="controls">
+            <select id="textStyle">
+                <option value="original">Без изменений</option>
+                <option value="formal">Официальный</option>
+                <option value="casual">Разговорный</option>
+                <option value="simple">Простой</option>
+                <option value="poetic">Поэтичный</option>
+            </select>
+            <div class="btn-group">
+                <button id="translateBtn">Перевести</button>
+                <button id="clearBtn">Очистить</button>
+            </div>
         </div>
         <p id="status"></p>
-    </div>
+    </main>
+
     <script src="script.js"></script>
 </body>
 </html>

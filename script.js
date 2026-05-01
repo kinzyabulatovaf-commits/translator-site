@@ -8,94 +8,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const status = document.getElementById('status');
     const textStyle = document.getElementById('textStyle');
 
-    const languages = [
-        { code: 'auto', name: 'Автоопределение' },
-        { code: 'en', name: 'English' },
-        { code: 'ru', name: 'Русский' },
-        { code: 'de', name: 'Deutsch' },
-        { code: 'fr', name: 'Français' },
-        { code: 'es', name: 'Español' },
-        { code: 'it', name: 'Italiano' },
-        { code: 'uk', name: 'Українська' },
-        { code: 'zh', name: '中文' },
-        { code: 'ja', name: '日本語' }
-    ];
-
-    languages.forEach(lang => {
-        const optFrom = document.createElement('option');
-        optFrom.value = lang.code;
-        optFrom.textContent = lang.name;
-        langFrom.appendChild(optFrom);
-
-        if (lang.code !== 'auto') {
-            const optTo = document.createElement('option');
-            optTo.value = lang.code;
-            optTo.textContent = lang.name;
-            langTo.appendChild(optTo);
+    // Словари стилизации (EN ↔ RU)
+    const styleMaps = {
+        en: {
+            formal: { hi: 'greetings', hello: 'greetings', thanks: 'thank you', ok: 'acknowledged', wanna: 'wish to', gonna: 'intend to', kids: 'children', guys: 'colleagues', bad: 'unsatisfactory', good: 'satisfactory', help: 'assistance', fix: 'resolve', buy: 'purchase' },
+            casual: { hello: 'hey', greetings: 'hi', thank: 'thanks', acknowledged: 'got it', wish: 'wanna', intend: 'gonna', children: 'kids', colleagues: 'guys', unsatisfactory: 'not great', satisfactory: 'pretty good', assistance: 'help', resolve: 'fix', purchase: 'buy' },
+            simple: { utilize: 'use', approximately: 'about', commence: 'start', terminate: 'end', obtain: 'get', difficult: 'hard', excellent: 'great', sufficient: 'enough', attempt: 'try' },
+            poetic: { very good: 'magnificent', bad: 'shadowed', happy: 'bright-hearted', sad: 'heavy-souled', beautiful: 'radiant', fast: 'swift as wind', slow: 'gentle as stream', big: 'vast', small: 'delicate', think: 'ponder', look: 'gaze', walk: 'wander' }
+        },
+        ru: {
+            formal: { привет: 'здравствуйте', спасибо: 'благодарю вас', ок: 'принято', пока: 'до свидания', ребята: 'коллеги', плохо: 'неудовлетворительно', хорошо: 'надлежащим образом', помощь: 'содействие', купить: 'приобрести', круто: 'превосходно' },
+            casual: { здравствуйте: 'привет', благодарю: 'спасибо', принято: 'ок', до свидания: 'пока', коллеги: 'ребята', неудовлетворительно: 'так себе', надлежащим образом: 'норм', содействие: 'помощь', приобрести: 'купить', превосходно: 'круто' },
+            simple: { использовать: 'применять', приблизительно: 'примерно', начать: 'начинать', завершить: 'закончить', получить: 'взять', сложный: 'трудный', достаточный: 'хватает', попытка: 'проба' },
+            poetic: { очень хорошо: 'великолепно', плохо: 'мрачно', счастлив: 'светел душой', грустно: 'тяжело на сердце', красиво: 'сияюще', быстро: 'словно ветер', медленно: 'тихой водой', большой: 'бескрайний', маленький: 'хрупкий', думаю: 'мечтаю', смотрю: 'любуюсь', иду: 'бреду' }
         }
-    });
-    langTo.value = 'ru';
+    };
 
-    // === 🎭 ФУНКЦИЯ СТИЛИЗАЦИИ ===
-    function applyTextStyle(text, style) {
+    function applyTextStyle(text, style, targetLang) {
         if (!text || style === 'original') return text;
         let result = text.trim();
+        const langMap = styleMaps[targetLang] || styleMaps.en;
+        const map = langMap[style];
 
-        const maps = {
-            formal: {
-                'hi': 'greetings', 'hello': 'greetings', 'hey': 'greetings',
-                'thanks': 'thank you', 'ok': 'acknowledged', 'okay': 'acknowledged',
-                'wanna': 'wish to', 'gonna': 'intend to', 'kids': 'children',
-                'guys': 'colleagues', 'bad': 'unsatisfactory', 'good': 'satisfactory',
-                'help': 'assistance', 'fix': 'resolve', 'buy': 'purchase'
-            },
-            casual: {
-                'hello': 'hey', 'greetings': 'hi', 'thank you': 'thanks',
-                'acknowledged': 'got it', 'wish to': 'wanna', 'intend to': 'gonna',
-                'children': 'kids', 'colleagues': 'guys', 'unsatisfactory': 'not great',
-                'satisfactory': 'pretty good', 'assistance': 'help', 'resolve': 'fix',
-                'purchase': 'buy'
-            },
-            simple: {
-                'utilize': 'use', 'approximately': 'about', 'commence': 'start',
-                'terminate': 'end', 'obtain': 'get', 'difficult': 'hard',
-                'excellent': 'great', 'sufficient': 'enough', 'attempt': 'try'
-            },
-            poetic: {
-                'very good': 'magnificent', 'bad': 'shadowed', 'happy': 'bright-hearted',
-                'sad': 'heavy-souled', 'beautiful': 'radiant', 'fast': 'swift as wind',
-                'slow': 'gentle as stream', 'big': 'vast', 'small': 'delicate',
-                'think': 'ponder', 'look': 'gaze', 'walk': 'wander'
-            }
-        };
-
-        if (maps[style]) {
-            Object.entries(maps[style]).forEach(([from, to]) => {
-                const regex = new RegExp(`\\b${from}\\b`, 'gi');
-                result = result.replace(regex, to);
+        if (map) {
+            Object.entries(map).forEach(([from, to]) => {
+                // Безопасный поиск целых слов (работает и для кириллицы)
+                const regex = new RegExp(`(^|[\\s,.;:!?(){}\\[\\]])${from}($|[\\s,.;:!?(){}\\[\\]])`, 'gi');
+                result = result.replace(regex, (match, p1, p2) => `${p1}${to}${p2}`);
             });
         }
 
-        if (style === 'formal' && !result.match(/^(dear|greetings|respectfully|please)/i)) {
-            result = 'Please find the following: ' + result.charAt(0).toUpperCase() + result.slice(1);
+        // Постобработка
+        const suffixes = { casual: targetLang === 'en' ? ' 😊' : ' 👌', poetic: targetLang === 'en' ? ' ✨\n' : ' 🌿\n' };
+        if (style === 'formal') {
+            const prefix = targetLang === 'en' ? 'Please note: ' : 'Просим обратить внимание: ';
+            if (!result.match(/^(dear|greetings|уважаемый|благодарю|примите|просим)/i)) {
+                result = prefix + result.charAt(0).toUpperCase() + result.slice(1);
+            }
         } else if (style === 'casual') {
-            result = result.replace(/([.!?])\s*$/, '') + ' 😊';
+            result = result.replace(/([.!?])\s*$/, '') + suffixes.casual;
         } else if (style === 'simple') {
             result = result.replace(/([.!?])\s+/g, '$1\n');
         } else if (style === 'poetic') {
-            result = result.replace(/([.!?])\s+/g, '$1 ✨\n');
+            result = result.replace(/([.!?])\s+/g, '$1' + suffixes.poetic);
         }
 
         return result.charAt(0).toUpperCase() + result.slice(1);
     }
 
-    // === 🔄 КНОПКА ПЕРЕВОДА ===
+    // По умолчанию: EN → RU
+    langFrom.value = 'en';
+    langTo.value = 'ru';
+
     translateBtn.addEventListener('click', async () => {
         const text = inputText.value.trim();
-        if (!text) { status.textContent = '⚠️ Введите текст'; return; }
+        if (!text) { status.textContent = 'Введите текст для перевода'; return; }
 
         translateBtn.disabled = true;
-        status.textContent = '⏳ Перевод и стилизация...';
+        status.textContent = 'Перевод и обработка...';
 
         const from = langFrom.value;
         const to = langTo.value;
@@ -103,20 +73,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const res = await fetch(url);
-            if (!res.ok) throw new Error('Ошибка сети');
             const data = await res.json();
 
             if (data.responseStatus === 200) {
                 const translated = data.responseData.translatedText;
-                outputText.value = applyTextStyle(translated, textStyle.value);
-                status.textContent = '✅ Готово!';
+                outputText.value = applyTextStyle(translated, textStyle.value, to);
+                status.textContent = 'Готово';
             } else {
-                throw new Error(data.responseDetails || 'Ошибка API');
+                status.textContent = 'Ошибка перевода';
             }
         } catch (err) {
-            console.error(err);
-            status.textContent = `❌ Ошибка: ${err.message}`;
-            outputText.value = '';
+            status.textContent = 'Ошибка сети';
         } finally {
             translateBtn.disabled = false;
         }

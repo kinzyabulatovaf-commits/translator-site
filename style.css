@@ -1,30 +1,199 @@
-/* Стили для плашки выбора стиля */
-.style-controls {
+:root {
+    --pear: #9DC183;
+    --pear-dark: #7A9463;
+    --pear-light: #E8F0E3;
+    --pear-hover: #85A870;
+    --text: #2D3A26;
+    --bg: #FAFCF9;
+    --border: #D1DFC8;
+    --shadow: 0 6px 24px rgba(157, 193, 131, 0.2);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1.5rem;
+}
+
+/* Шапка */
+.header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.logo-placeholder {
+    font-size: 2.8rem;
+    margin-bottom: 0.4rem;
+}
+
+.slogan {
+    font-size: 1.05rem;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    color: var(--pear-dark);
+    text-transform: uppercase;
+}
+
+/* Основной блок */
+.container {
+    width: 100%;
+    max-width: 680px;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+/* Языки */
+.lang-selectors {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.8rem;
-    margin: 0.5rem 0 1rem;
-    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-    .style-controls label {
-        font-weight: 500;
-        color: #555;
+    .lang-selectors select {
+        padding: 0.55rem 1rem;
         font-size: 0.95rem;
-    }
-
-    .style-controls select {
-        padding: 0.6rem 1rem;
-        font-size: 0.95rem;
-        border: 2px solid #ddd;
-        border-radius: 6px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--pear-light);
+        color: var(--text);
         cursor: pointer;
-        background: #fff;
-        transition: border-color 0.3s;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237A9463' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 14px;
+        padding-right: 30px;
     }
 
-        .style-controls select:focus {
-            outline: none;
-            border-color: #2575fc;
-        }
+.arrow {
+    color: var(--pear-dark);
+    font-size: 1.1rem;
+}
+
+/* Поля текста */
+.text-box {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+textarea {
+    width: 100%;
+    min-height: 130px;
+    padding: 1rem;
+    border: none;
+    font-size: 1rem;
+    font-family: inherit;
+    background: transparent;
+    resize: vertical;
+    outline: none;
+    line-height: 1.5;
+}
+
+#outputText {
+    background: var(--pear-light);
+    border-top: 1px solid var(--border);
+}
+
+.divider {
+    height: 1px;
+    background: var(--border);
+}
+
+/* Управление */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#textStyle {
+    padding: 0.55rem 1rem;
+    font-size: 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.btn-group {
+    display: flex;
+    gap: 0.7rem;
+}
+
+button {
+    padding: 0.65rem 1.4rem;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+#translateBtn {
+    background: var(--pear);
+    color: #fff;
+}
+
+    #translateBtn:hover {
+        background: var(--pear-hover);
+    }
+
+    #translateBtn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+#clearBtn {
+    background: transparent;
+    color: var(--pear-dark);
+    border: 1px solid var(--border);
+}
+
+    #clearBtn:hover {
+        background: var(--pear-light);
+    }
+
+#status {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: #6B7A63;
+    min-height: 1.2em;
+    transition: opacity 0.3s;
+}
+
+@media (max-width: 600px) {
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-group {
+        justify-content: center;
+    }
+
+    .container {
+        padding: 1.5rem;
+    }
+}
