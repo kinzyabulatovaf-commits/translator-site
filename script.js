@@ -8,19 +8,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const status = document.getElementById('status');
     const textStyle = document.getElementById('textStyle');
 
-    // Словари стилизации (EN ↔ RU)
+    // Проверка загрузки DOM
+    if (!langFrom || !inputText) {
+        console.error('❌ Элементы HTML не найдены. Проверьте index.html');
+        return;
+    }
+
     const styleMaps = {
         en: {
-            formal: { hi: 'greetings', hello: 'greetings', thanks: 'thank you', ok: 'acknowledged', wanna: 'wish to', gonna: 'intend to', kids: 'children', guys: 'colleagues', bad: 'unsatisfactory', good: 'satisfactory', help: 'assistance', fix: 'resolve', buy: 'purchase' },
-            casual: { hello: 'hey', greetings: 'hi', thank: 'thanks', acknowledged: 'got it', wish: 'wanna', intend: 'gonna', children: 'kids', colleagues: 'guys', unsatisfactory: 'not great', satisfactory: 'pretty good', assistance: 'help', resolve: 'fix', purchase: 'buy' },
-            simple: { utilize: 'use', approximately: 'about', commence: 'start', terminate: 'end', obtain: 'get', difficult: 'hard', excellent: 'great', sufficient: 'enough', attempt: 'try' },
-            poetic: { very good: 'magnificent', bad: 'shadowed', happy: 'bright-hearted', sad: 'heavy-souled', beautiful: 'radiant', fast: 'swift as wind', slow: 'gentle as stream', big: 'vast', small: 'delicate', think: 'ponder', look: 'gaze', walk: 'wander' }
+            formal: {
+                'hi': 'greetings', 'hello': 'greetings', 'thanks': 'thank you',
+                'ok': 'acknowledged', 'wanna': 'wish to', 'gonna': 'intend to',
+                'kids': 'children', 'guys': 'colleagues', 'bad': 'unsatisfactory',
+                'good': 'satisfactory', 'help': 'assistance', 'fix': 'resolve',
+                'buy': 'purchase'
+            },
+            casual: {
+                'hello': 'hey', 'greetings': 'hi', 'thank': 'thanks',
+                'acknowledged': 'got it', 'wish': 'wanna', 'intend': 'gonna',
+                'children': 'kids', 'colleagues': 'guys', 'unsatisfactory': 'not great',
+                'satisfactory': 'pretty good', 'assistance': 'help', 'resolve': 'fix',
+                'purchase': 'buy'
+            },
+            simple: {
+                'utilize': 'use', 'approximately': 'about', 'commence': 'start',
+                'terminate': 'end', 'obtain': 'get', 'difficult': 'hard',
+                'excellent': 'great', 'sufficient': 'enough', 'attempt': 'try'
+            },
+            poetic: {
+                'very good': 'magnificent', 'bad': 'shadowed', 'happy': 'bright-hearted',
+                'sad': 'heavy-souled', 'beautiful': 'radiant', 'fast': 'swift as wind',
+                'slow': 'gentle as stream', 'big': 'vast', 'small': 'delicate',
+                'think': 'ponder', 'look': 'gaze', 'walk': 'wander'
+            }
         },
         ru: {
-            formal: { привет: 'здравствуйте', спасибо: 'благодарю вас', ок: 'принято', пока: 'до свидания', ребята: 'коллеги', плохо: 'неудовлетворительно', хорошо: 'надлежащим образом', помощь: 'содействие', купить: 'приобрести', круто: 'превосходно' },
-            casual: { здравствуйте: 'привет', благодарю: 'спасибо', принято: 'ок', до свидания: 'пока', коллеги: 'ребята', неудовлетворительно: 'так себе', надлежащим образом: 'норм', содействие: 'помощь', приобрести: 'купить', превосходно: 'круто' },
-            simple: { использовать: 'применять', приблизительно: 'примерно', начать: 'начинать', завершить: 'закончить', получить: 'взять', сложный: 'трудный', достаточный: 'хватает', попытка: 'проба' },
-            poetic: { очень хорошо: 'великолепно', плохо: 'мрачно', счастлив: 'светел душой', грустно: 'тяжело на сердце', красиво: 'сияюще', быстро: 'словно ветер', медленно: 'тихой водой', большой: 'бескрайний', маленький: 'хрупкий', думаю: 'мечтаю', смотрю: 'любуюсь', иду: 'бреду' }
+            formal: {
+                'привет': 'здравствуйте', 'спасибо': 'благодарю вас', 'ок': 'принято',
+                'пока': 'до свидания', 'ребята': 'коллеги', 'плохо': 'неудовлетворительно',
+                'хорошо': 'надлежащим образом', 'помощь': 'содействие', 'купить': 'приобрести',
+                'круто': 'превосходно'
+            },
+            casual: {
+                'здравствуйте': 'привет', 'благодарю': 'спасибо', 'принято': 'ок',
+                'до свидания': 'пока', 'коллеги': 'ребята', 'неудовлетворительно': 'так себе',
+                'надлежащим образом': 'норм', 'содействие': 'помощь', 'приобрести': 'купить',
+                'превосходно': 'круто'
+            },
+            simple: {
+                'использовать': 'применять', 'приблизительно': 'примерно',
+                'начать': 'начинать', 'завершить': 'закончить', 'получить': 'взять',
+                'сложный': 'трудный', 'достаточный': 'хватает', 'попытка': 'проба'
+            },
+            poetic: {
+                'очень хорошо': 'великолепно', 'плохо': 'мрачно', 'счастлив': 'светел душой',
+                'грустно': 'тяжело на сердце', 'красиво': 'сияюще', 'быстро': 'словно ветер',
+                'медленно': 'тихой водой', 'большой': 'бескрайний', 'маленький': 'хрупкий',
+                'думаю': 'мечтаю', 'смотрю': 'любуюсь', 'иду': 'бреду'
+            }
         }
     };
 
@@ -31,11 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const map = langMap[style];
 
         if (map) {
-            Object.entries(map).forEach(([from, to]) => {
+            for (const [from, to] of Object.entries(map)) {
                 const escaped = from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 const regex = new RegExp(`(^|[\\s,.;:!?(){}\\[\\]])${escaped}($|[\\s,.;:!?(){}\\[\\]])`, 'gi');
-                result = result.replace(regex, (match, p1, p2) => `${p1}${to}${p2}`);
-            });
+                result = result.replace(regex, `$1${to}$2`);
+            }
         }
 
         const suffixes = { casual: targetLang === 'en' ? ' 😊' : ' 👌', poetic: targetLang === 'en' ? ' ✨\n' : ' 🌿\n' };
@@ -58,6 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
     langFrom.value = 'en';
     langTo.value = 'ru';
 
+    console.log('✅ Скрипт загружен успешно. Готов к работе.');
+
     translateBtn.addEventListener('click', async () => {
         const text = inputText.value.trim();
         if (!text) { status.textContent = 'Введите текст'; return; }
@@ -69,35 +116,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const from = langFrom.value;
         const to = langTo.value;
-        
-        // Добавлен параметр &de для увеличения лимита (5000 слов/день)
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}&mt=1&de=github_user@demo.com`;
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}&mt=1`;
 
         try {
-            console.log('🌐 Отправка запроса:', url);
+            console.log('🌐 Запрос:', url);
             const res = await fetch(url, { cache: 'no-store' });
-            if (!res.ok) throw new Error(`Сеть: ${res.status} ${res.statusText}`);
-            
-            const data = await res.json();
-            console.log('📦 Ответ API:', data);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-            // Устойчивая проверка (число 200 или строка "200")
-            if (data.responseStatus == 200 && data.responseData?.translatedText) {
+            const data = await res.json();
+            console.log('📦 Ответ:', data);
+
+            if (data.responseStatus == 200 && data.responseData && data.responseData.translatedText) {
                 const translated = data.responseData.translatedText;
-                console.log('✅ Перевод получен:', translated);
-                
-                // Применяем стиль
+                await new Promise(r => setTimeout(r, 300));
                 outputText.value = applyTextStyle(translated, textStyle.value, to);
                 status.textContent = 'Готово';
             } else {
-                // Если API вернул ошибку или лимит превышен
-                const err = data.responseDetails || 'API вернул пустой ответ или превышен лимит';
-                throw new Error(err);
+                throw new Error(data.responseDetails || 'Пустой ответ от API');
             }
         } catch (err) {
             console.error('❌ Ошибка:', err);
-            status.textContent = 'Ошибка API. Попробуйте через 1 минуту или проверьте интернет.';
-            outputText.value = '';
+            status.textContent = 'Ошибка сети или API. Попробуйте позже.';
         } finally {
             translateBtn.disabled = false;
             translateBtn.textContent = 'Перевести';
