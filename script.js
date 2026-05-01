@@ -32,13 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (map) {
             Object.entries(map).forEach(([from, to]) => {
-                // Безопасный поиск целых слов (работает и для кириллицы)
                 const regex = new RegExp(`(^|[\\s,.;:!?(){}\\[\\]])${from}($|[\\s,.;:!?(){}\\[\\]])`, 'gi');
                 result = result.replace(regex, (match, p1, p2) => `${p1}${to}${p2}`);
             });
         }
 
-        // Постобработка
         const suffixes = { casual: targetLang === 'en' ? ' 😊' : ' 👌', poetic: targetLang === 'en' ? ' ✨\n' : ' 🌿\n' };
         if (style === 'formal') {
             const prefix = targetLang === 'en' ? 'Please note: ' : 'Просим обратить внимание: ';
@@ -65,7 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!text) { status.textContent = 'Введите текст для перевода'; return; }
 
         translateBtn.disabled = true;
-        status.textContent = 'Перевод и обработка...';
+        translateBtn.textContent = 'Загрузка...';
+        status.textContent = '';
 
         const from = langFrom.value;
         const to = langTo.value;
@@ -77,6 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.responseStatus === 200) {
                 const translated = data.responseData.translatedText;
+                
+                // Имитация "дорогой" задержки для плавности (опционально, но стильно)
+                await new Promise(r => setTimeout(r, 300)); 
+                
                 outputText.value = applyTextStyle(translated, textStyle.value, to);
                 status.textContent = 'Готово';
             } else {
@@ -86,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
             status.textContent = 'Ошибка сети';
         } finally {
             translateBtn.disabled = false;
+            translateBtn.textContent = 'Перевести';
         }
     });
 

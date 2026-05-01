@@ -3,50 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Переводчик</title>
+    <title>Pear Translator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="header">
-        <!-- Замените div ниже на <img src="logo.png" alt="Логотип" class="logo"> когда будет готов -->
-        <div class="logo-placeholder">🍐</div>
-        <h1 class="slogan">Бесконечность — не предел</h1>
-    </header>
+    <!-- Фоновые элементы -->
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
 
-    <main class="container">
-        <div class="lang-selectors">
-            <select id="langFrom">
-                <option value="en">English</option>
-                <option value="ru">Русский</option>
-            </select>
-            <span class="arrow">→</span>
-            <select id="langTo">
-                <option value="ru">Русский</option>
-                <option value="en">English</option>
-            </select>
-        </div>
+    <div class="wrapper">
+        <header class="header">
+            <img src="pear.png" alt="Логотип" class="logo" onerror="this.style.display='none';document.querySelector('.logo-fallback').style.display='block'">
+            <span class="logo-fallback">🍐</span>
+            <h1 class="slogan">Бесконечность — не предел</h1>
+        </header>
 
-        <div class="text-box">
-            <textarea id="inputText" placeholder="Введите текст..."></textarea>
-            <div class="divider"></div>
-            <textarea id="outputText" placeholder="Перевод..." readonly></textarea>
-        </div>
-
-        <div class="controls">
-            <select id="textStyle">
-                <option value="original">Без изменений</option>
-                <option value="formal">Официальный</option>
-                <option value="casual">Разговорный</option>
-                <option value="simple">Простой</option>
-                <option value="poetic">Поэтичный</option>
-            </select>
-            <div class="btn-group">
-                <button id="translateBtn">Перевести</button>
-                <button id="clearBtn">Очистить</button>
+        <main class="card">
+            <div class="lang-bar">
+                <div class="lang-group">
+                    <label>Исходный</label>
+                    <select id="langFrom">
+                        <option value="en">English</option>
+                        <option value="ru">Русский</option>
+                    </select>
+                </div>
+                <div class="arrow-circle">→</div>
+                <div class="lang-group">
+                    <label>Перевод</label>
+                    <select id="langTo">
+                        <option value="ru">Русский</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <p id="status"></p>
-    </main>
+
+            <div class="text-area-wrapper">
+                <textarea id="inputText" placeholder="Введите текст для перевода..."></textarea>
+                <div class="divider"></div>
+                <textarea id="outputText" placeholder="Здесь появится перевод..." readonly></textarea>
+            </div>
+
+            <div class="controls">
+                <div class="style-select">
+                    <label>Стиль</label>
+                    <div class="select-custom">
+                        <select id="textStyle">
+                            <option value="original">Без изменений</option>
+                            <option value="formal">Официальный</option>
+                            <option value="casual">Разговорный</option>
+                            <option value="simple">Простой</option>
+                            <option value="poetic">Поэтичный</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button id="clearBtn">Очистить</button>
+                    <button id="translateBtn">Перевести</button>
+                </div>
+            </div>
+            <p id="status"></p>
+        </main>
+    </div>
 
     <script src="script.js"></script>
 </body>
