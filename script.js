@@ -32,7 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (map) {
             Object.entries(map).forEach(([from, to]) => {
-                const regex = new RegExp(`(^|[\\s,.;:!?(){}\\[\\]])${from}($|[\\s,.;:!?(){}\\[\\]])`, 'gi');
+                // Экранируем спецсимволы для безопасного Regex
+                const escaped = from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(^|[\\s,.;:!?(){}\\[\\]])${escaped}($|[\\s,.;:!?(){}\\[\\]])`, 'gi');
                 result = result.replace(regex, (match, p1, p2) => `${p1}${to}${p2}`);
             });
         }
@@ -60,33 +62,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     translateBtn.addEventListener('click', async () => {
         const text = inputText.value.trim();
-        if (!text) { status.textContent = 'Введите текст для перевода'; return; }
+        if (!text) {
+            status.textContent = 'Введите текст для перевода';
+            return;
+        }
 
         translateBtn.disabled = true;
-        translateBtn.textContent = 'Загрузка...';
+        translateBtn.textContent = 'Перевод...';
         status.textContent = '';
+        outputText.value = '';
 
         const from = langFrom.value;
         const to = langTo.value;
+        console.log(`🌐 Запрос: ${from} → ${to} | Стиль: ${textStyle.value}`);
+
         const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`;
 
         try {
             const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
+            console.log('📦 Ответ API:', data);
 
-            if (data.responseStatus === 200) {
+            // Устойчивая проверка (учитывает строку "200" и число 200)
+            if (data.responseData && data.responseData.translatedText) {
                 const translated = data.responseData.translatedText;
+                console.log('✅ Сырой перевод:', translated);
                 
-                // Имитация "дорогой" задержки для плавности (опционально, но стильно)
-                await new Promise(r => setTimeout(r, 300)); 
+                // Небольшая задержка для плавности UX
+                await new Promise(r => setTimeout(r, 300));
                 
                 outputText.value = applyTextStyle(translated, textStyle.value, to);
                 status.textContent = 'Готово';
+                console.log('✨ Итог:', outputText.value);
             } else {
-                status.textContent = 'Ошибка перевода';
+                throw new Error(data.responseDetails || 'API вернул пустой ответ');
             }
         } catch (err) {
-            status.textContent = 'Ошибка сети';
+            console.error('❌ Ошибка:', err);
+            status.textContent = `Ошибка: ${err.message}`;
+            outputText.value = 'Не удалось перевести текст. Попробуйте позже.';
         } finally {
             translateBtn.disabled = false;
             translateBtn.textContent = 'Перевести';
